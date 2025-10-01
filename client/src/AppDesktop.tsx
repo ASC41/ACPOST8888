@@ -1,0 +1,62 @@
+import { Route, Switch, useLocation } from "wouter";
+import { useEffect } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import NotFound from "@/pages/not-found";
+import Navigation from "@/components/Navigation";
+import SelectedWorks from "@/pages/SelectedWorks";
+import About from "@/pages/About";
+import Contact from "@/pages/Contact";
+import ShortFilms from "@/pages/ShortFilms";
+import Directing from "@/pages/Directing";
+import Footer from "@/components/Footer";
+
+function AppDesktop() {
+  const [location] = useLocation();
+
+  // Scroll to top when route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
+  // Track page views for Google Analytics - fires AFTER title updates
+  useEffect(() => {
+    // Small delay to ensure document.title is updated by page component
+    const timeoutId = setTimeout(() => {
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('config', 'G-1591M9GRCS', {
+          page_path: location,
+          page_title: document.title,
+          page_location: window.location.href,
+          page_referrer: document.referrer
+        });
+      }
+    }, 0);
+    
+    return () => clearTimeout(timeoutId);
+  }, [location]);
+
+  return (
+    <TooltipProvider>
+      <div className="flex flex-col min-h-screen bg-gray-900">
+        <Navigation />
+        <main className="flex-grow bg-gray-900">
+          <Switch>
+            <Route path="/" component={SelectedWorks} />
+            <Route path="/selected-works" component={SelectedWorks} />
+            <Route path="/featured-works" component={SelectedWorks} />
+            <Route path="/short-films" component={ShortFilms} />
+            <Route path="/directing" component={Directing} />
+            <Route path="/about" component={About} />
+            <Route path="/contact" component={Contact} />
+            <Route component={NotFound} />
+          </Switch>
+        </main>
+        <Footer />
+      </div>
+      <Toaster />
+    </TooltipProvider>
+  );
+}
+
+export default AppDesktop;
